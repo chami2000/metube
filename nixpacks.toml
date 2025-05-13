@@ -1,0 +1,29 @@
+[phases.setup]
+nixPkgs = ["python311", "nodejs", "ffmpeg", "aria2", "curl"]
+
+[phases.install]
+cmds = [
+  # Install frontend dependencies
+  "cd ui && npm ci",
+  # Build frontend
+  "node_modules/.bin/ng build --configuration production",
+  "cd ..",
+  # Install Python dependencies
+  "pip install --no-cache-dir pipenv",
+  "pipenv install --system --deploy --clear"
+]
+
+[phases.build]
+cmds = [
+  "mkdir -p /app/ui/dist/metube",
+  "cp -r ui/dist/metube/* /app/ui/dist/metube/"
+]
+
+[start]
+cmd = "python -m app.main"
+
+[variables]
+DOWNLOAD_DIR = "/downloads"
+STATE_DIR = "/downloads/.metube"
+TEMP_DIR = "/downloads"
+PORT = "8081"
